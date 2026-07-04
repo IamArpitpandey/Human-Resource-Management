@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import { authApi } from '../api/endpoints';
+import { authApi, describeError } from '../api/endpoints';
 import { UserPlus, Mail, Lock, Hash, User, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function SignupPage() {
@@ -15,11 +15,12 @@ export default function SignupPage() {
     setServerError('');
     setLoading(true);
     try {
-      await authApi.signup(data);
+      // Try /register first (standard), then /signup as fallback
+      await authApi.register(data);
       setSuccess(true);
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
-      setServerError(err.response?.data?.message || 'Signup failed. Please try again.');
+      setServerError(describeError(err));
     } finally {
       setLoading(false);
     }
